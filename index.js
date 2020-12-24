@@ -27,7 +27,7 @@ loader
 //Define any variables that are used in more than one function
 let cat;
 let obstac;
-
+var over;
 function setup() {
 
   //Create the `cat` sprite 
@@ -39,6 +39,8 @@ function setup() {
   obstac.y = 96
   obstac.x = 60
   obstac.vx = 0
+  obstac.interactive = true;
+  obstac.on('pointerdown', onClick);
   app.stage.addChild(obstac)
      //Capture the keyboard arrow keys
     let left = keyboard("ArrowLeft"),
@@ -50,7 +52,7 @@ function setup() {
     //Left arrow key `press` method
   right.press = () => {
     //Change the cat's velocity when the key is pressed
-    cat.vx = 1;
+    // cat.vx = 1;
     cat.vy = 0;
     console.log("dddddd")
   };
@@ -65,6 +67,12 @@ function setup() {
 function gameLoop(delta){
     //cat.vx = 0
     //obstac.vx = 0
+    if (over) {
+        obstac.tint = 0xDDDDDD
+    }
+    else {
+        obstac.tint = 0xFFFFFF
+    }
     cat.x += cat.vx;
     obstac.x += obstac.vx;
     if (cat.x > 256) {
@@ -180,4 +188,9 @@ function keyboard(value) {
   };
   
   return key;
+}
+
+function onClick(){
+    //obstac.y += 20
+    console.log("click")
 }
