@@ -22,15 +22,28 @@ document.body.appendChild(app.view);
 
 loader
   .add("/sprites/cubo.png")
+  .add("/sprites/fundinho-1.png")
   .load(setup);
 
 var player;
-
+var fundo;
 function setup() {
     console.log("iniciado")
+    fundo = PIXI.Texture.from("/sprites/fundinho-1.png")
+    
+    const tilingSprite = new PIXI.TilingSprite(
+        fundo,
+        10000,
+        10000,
+    );
+    tilingSprite.x -= 5000-8
+    tilingSprite.y -= 5000-8
+
+    app.stage.addChild(tilingSprite);
+
     player = new Sprite(resources["/sprites/cubo.png"].texture)
-    player.x = 30
-    player.y = 30
+    player.x = 0
+    player.y = 0
     player.v = 4
     player.dx = 0
     player.dy = 0
@@ -82,9 +95,9 @@ function setup() {
 function gameLoop(delta) {
     player.x += player.v * player.dx
     player.y += player.v * player.dy
-    app.stage.pivot.x = player.x;
-    app.stage.pivot.y = player.y;
-    app.stage.position.x = app.radaenderer.width/2;
+    app.stage.pivot.x = player.x+16;
+    app.stage.pivot.y = player.y+16;
+    app.stage.position.x = app.renderer.width/2;
     app.stage.position.y = app.renderer.height/2;
     // player.y += 400 * delta
 }
