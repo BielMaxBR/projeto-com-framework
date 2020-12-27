@@ -9,8 +9,8 @@ let Application = PIXI.Application,
 
 //Create a Pixi Application
 let app = new Application({ 
-    width: 256, 
-    height: 256,                       
+    width: 800, 
+    height: 600,                       
     antialias: true, 
     transparent: false, 
     resolution: 1
@@ -19,7 +19,7 @@ let app = new Application({
 // frio na barriga
 //Add the canvas that Pixi automatically created for you to the HTML document
 document.body.appendChild(app.view);
-
+console.log(Math.sqrt(4))
 loader
   .add("/sprites/cubo.png")
   .add("/sprites/fundinho-1.png")
