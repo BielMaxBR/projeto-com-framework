@@ -7,9 +7,8 @@ const server = http.createServer(app)
 const io = socketIo(server)
 
 var sala = ""
-app.use(bodyParser.urlencoded({
-    extended: true
-})); 
+app.use(bodyParser.json())
+
 app.get('/', (req, res) => {
     console.log('entrou')
     res.send('oi <script> function</script>')
@@ -19,7 +18,7 @@ app.get('/', (req, res) => {
 
 app.post('/create', (req, res) => {
     console.log(req.body)
-    res.send("yes! "+req.body)
+    res.send("yes! "+req.body["oh"])
 })
 
 function entrar(valor) {
