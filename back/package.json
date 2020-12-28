@@ -1,0 +1,26 @@
+{
+  "name": "backturno",
+  "version": "1.0.0",
+  "description": "backend pra um jogo de turno",
+  "main": "index.js",
+  "scripts": {
+    "test": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BielMaxBR/projeto-com-framework.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BielMaxBR/projeto-com-framework/issues"
+  },
+  "homepage": "https://github.com/BielMaxBR/projeto-com-framework#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "http": "0.0.1-security",
+    "nodemon": "^2.0.6",
+    "socket.io": "^3.0.4"
+  }
+}
