@@ -194,3 +194,24 @@ function onClick(){
     //obstac.y += 20
     console.log("click")
 }
+
+
+// aqui comeca a loucura
+
+var socket = io.connect(location.href);
+
+var usersOn = []
+
+socket.on('connect', function(){
+    socket.emit('adduser', prompt("What's your name: "));
+    console.log('entrei')
+});
+
+socket.on('updateUsers', (newUser) => {
+    usersOn[newUser] = newUser
+    // delete o['lastName']
+})
+
+socket.on('updatechat',(username, data) =>{
+    console.log(username+": "+data)
+})
