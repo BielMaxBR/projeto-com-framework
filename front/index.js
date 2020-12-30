@@ -199,7 +199,6 @@ function onClick(){
 // aqui comeca a loucura
 
 var socket = io.connect(location.href);
-
 var usersOn = {}
 var roomsOn = []
 var connected = false
