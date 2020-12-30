@@ -54,7 +54,7 @@ function setup() {
     //Change the cat's velocity when the key is pressed
     // cat.vx = 1;
     cat.vy = 0;
-    console.log("dddddd")
+    // console.log("dddddd")
   };
 
   right.release = () => {
@@ -82,7 +82,7 @@ function gameLoop(delta){
         obstac.x = -32
     }
     if (hitTestRectangle(obstac, cat)) {
-        console.log("tum")
+        // console.log("tum")
         obstac.vx = cat.vx
     }
     else {
@@ -192,7 +192,7 @@ function keyboard(value) {
 
 function onClick(){
     //obstac.y += 20
-    console.log("click")
+    // console.log("click")
 }
 
 
@@ -200,18 +200,48 @@ function onClick(){
 
 var socket = io.connect(location.href);
 
-var usersOn = []
-
+var usersOn = {}
+var roomsOn = []
+var connected = false
 socket.on('connect', function(){
-    socket.emit('adduser', prompt("What's your name: "));
-    console.log('entrei')
+    // socket.emit('adduser', prompt("What's your name: "));
+    // console.log('entrei')
+    connected = true
 });
 
-socket.on('updateUsers', (newUser) => {
-    usersOn[newUser] = newUser
-    // delete o['lastName']
+socket.on('updateUsers', (UserList) => {
+    usersOn = UserList
+    // console.log("Server")
 })
 
-socket.on('updatechat',(username, data) =>{
-    console.log(username+": "+data)
+socket.on('updateChat',(username, data) =>{
+    console.log("["+username+"]"+": "+data)
 })
+
+socket.on('updateRooms', (rooms) =>{
+    roomsOn = rooms
+})
+
+socket.on('disconnect', () => {
+    connected = false
+})
+
+function createRoom(newRoom) {
+    socket.emit('createRoom', newRoom)
+}
+
+function switchRoom(Room) {
+    socket.emit('switchRoom', Room)
+}
+
+function connect(name) {
+    if (connected) {
+        socket.emit('addUser', name)
+    }
+}
+
+function chat(msg) {
+    if (connected) {
+        socket.emit('message', msg)
+    }
+}
