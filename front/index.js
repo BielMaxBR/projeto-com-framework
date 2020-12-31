@@ -225,6 +225,10 @@ socket.on('disconnect', () => {
     connected = false
 })
 
+socket.on('test', (data)=>{
+    console.log(data)
+})
+
 function createRoom(newRoom, numPlayer) {
     socket.emit('createRoom', newRoom, numPlayer)
 }
@@ -233,14 +237,20 @@ function switchRoom(Room) {
     socket.emit('switchRoom', Room)
 }
 
-function connect(name) {
+function connect(name, sala) {
     if (connected) {
-        socket.emit('addUser', name)
+        socket.emit('addUser', name, sala)
     }
 }
 
 function chat(msg) {
     if (connected) {
         socket.emit('message', msg)
+    }
+}
+
+function test(ss) {
+    if (connected) {
+        socket.emit('test', ss)
     }
 }
