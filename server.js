@@ -7,7 +7,7 @@ const app = express()
 const server = http.createServer(app)
 const io = socketIo(server)
 
-var rooms = {'Lobby':{}}
+var rooms = {}
 var totalUsers = {}
 var configRooms = {}
 app.use(bodyParser.json())
@@ -27,7 +27,7 @@ io.sockets.on('connection', (socket) => {
             configRooms[room]["numPlayers"] = numPlayers
             console.log(rooms[room])
 
-            socket.emit('updateRooms', rooms, socket.room);
+            socket.emit('updateRooms', Object.keys(rooms));
         }
     });
 
@@ -37,20 +37,20 @@ io.sockets.on('connection', (socket) => {
             return
         }
         else {
-            console.log(username+' entrou')
             if (username === null) {return}
             if (rooms[room] == undefined) {socket.emit('updateChat', 'SERVER', 'essa sala não existe'); return}
+            console.log(username+' entrou')
             socket.username = username
             socket.room = room
             totalUsers[username] = username
             console.log(rooms[room])
-            // rooms[room]["shinra"] = "shinra"
+            rooms[room][username] = username
             socket.join(room)
             socket.emit('updateChat', 'SERVER', 'você se conectou em '+room);
             socket.broadcast.to(room).emit('updateChat', 'SERVER', username + ' se conectou na sala');
-            socket.emit('updateUsers', rooms[room])
-            socket.broadcast.to(room).emit('updateUsers', rooms[room])
-            socket.emit('updateRooms', rooms)
+            socket.emit('updateUsers', Object.keys(rooms[room]))
+            socket.broadcast.to(room).emit('updateUsers', Object.keys(rooms[room]))
+            socket.emit('updateRooms', Object.keys(rooms))
             console.log(Object.keys(totalUsers).length)
         }
     })
@@ -63,14 +63,14 @@ io.sockets.on('connection', (socket) => {
             socket.join(newroom);
             delete rooms[oldroom][socket.username]
             socket.emit('updateChat', 'SERVER', 'você se conectou em ' + newroom);
-            socket.broadcast.to(oldroom).emit('updateUsers', rooms[oldroom])
+            socket.broadcast.to(oldroom).emit('updateUsers', Object.keys(rooms[oldroom]))
             socket.broadcast.to(oldroom).emit('updateChat', 'SERVER', socket.username + ' saiu dessa sala');
             socket.room = newroom;
             socket.broadcast.to(newroom).emit('updateChat', 'SERVER', socket.username + ' se conectou na sala');
             rooms[newroom][socket.username] = socket.username
-            socket.emit('updateUsers', rooms[newroom])
-            socket.broadcast.to(newroom).emit('updateUsers', rooms[newroom])
-            socket.emit('updateRooms', rooms, newroom)
+            socket.emit('updateUsers', Object.keys(rooms[newroom]))
+            socket.broadcast.to(newroom).emit('updateUsers', Object.keys(rooms[newroom]))
+            socket.emit('updateRooms', Object.keys(rooms))
         }
     });
     socket.on('message', (msg)=>{
@@ -84,11 +84,10 @@ io.sockets.on('connection', (socket) => {
         if (socket.room) {
             delete totalUsers[socket.username]
             delete rooms[socket.room][socket.username]
-            // io.sockets.emit('updateUsers', users, true);
-            socket.broadcast.to(socket.room).emit('updateUsers', socket.username, true)
-            socket.broadcast.emit('updateChat', 'SERVER', socket.username + ' saiu dessa sala');
+            socket.broadcast.to(socket.room).emit('updateUsers', Object.keys(rooms[socket.room]))
+            socket.broadcast.to(socket.room).emit('updateChat', 'SERVER', socket.username + ' saiu dessa sala');
             socket.leave(socket.room);
-            console.log('saiu')
+            console.log(socket.username+' saiu')
             console.log(Object.keys(totalUsers).length)
         }
         else {
