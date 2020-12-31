@@ -9,6 +9,7 @@ const io = socketIo(server)
 
 var rooms = {'Lobby':{}}
 var totalUsers = {}
+var configRooms = {}
 app.use(bodyParser.json())
 
 app.use(express.static(path.join(__dirname, 'front')))
@@ -36,12 +37,15 @@ io.sockets.on('connection', (socket) => {
         }
     })
 
-    socket.on('createRoom', function(room) {
+    socket.on('createRoom', function(room, numPlayers) {
         if (rooms[room]) {
             socket.emit('updateChat', 'SERVER', 'essa sala já existe');
         }
         else {
             rooms[room] = {}
+            configRooms[room] = {}
+            configRooms[room]["numPlayers"] = numPlayers
+
             socket.emit('updateRooms', rooms, socket.room);
         }
     });

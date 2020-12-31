@@ -225,8 +225,8 @@ socket.on('disconnect', () => {
     connected = false
 })
 
-function createRoom(newRoom) {
-    socket.emit('createRoom', newRoom)
+function createRoom(newRoom, numPlayer) {
+    socket.emit('createRoom', newRoom, numPlayer)
 }
 
 function switchRoom(Room) {
