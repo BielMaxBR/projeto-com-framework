@@ -17,7 +17,7 @@ console.log('pronto!')
 io.sockets.on('connection', (socket) => {
     socket.emit('updateRooms', rooms)
 
-    socket.on('createRoom', function(room, numPlayers = 2) {
+    socket.on('createRoom', function(room, numPlayers = 4) {
         if (rooms[room]) {
             socket.emit('updateChat', 'SERVER', 'essa sala já existe');
         }
