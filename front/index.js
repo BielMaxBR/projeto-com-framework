@@ -229,8 +229,8 @@ socket.on('test', (data)=>{
     console.log(data)
 })
 
-function createRoom(newRoom, numPlayer) {
-    socket.emit('createRoom', newRoom, numPlayer)
+function createRoom(newRoom) {
+    socket.emit('createRoom', newRoom)
 }
 
 function switchRoom(Room) {

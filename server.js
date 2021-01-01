@@ -1,4 +1,4 @@
-var bodyParser = require('body-parser'); 
+const bodyParser = require('body-parser'); 
 const socketIo = require('socket.io')
 const express = require('express')
 const path = require('path')
@@ -10,23 +10,30 @@ const io = socketIo(server)
 var rooms = {}
 var totalUsers = {}
 var configRooms = {}
-app.use(bodyParser.json())
 
+app.use(bodyParser.json())
 app.use(express.static(path.join(__dirname, 'front')))
+
 console.log('pronto!')
+
 io.sockets.on('connection', (socket) => {
     socket.emit('updateRooms', rooms)
 
-    socket.on('createRoom', function(room, numPlayers = 4) {
+    socket.on('createRoom', function(room) {
         if (rooms[room]) {
             socket.emit('updateChat', 'SERVER', 'essa sala já existe');
         }
         else {
             rooms[room] = {}
             configRooms[room] = {}
-            configRooms[room]["numPlayers"] = numPlayers
-            console.log(rooms[room])
-
+            configRooms[room]["numPlayers"] = 4
+            configRooms[room]["turn"] = 0
+            configRooms[room]["direction"] = 1
+            configRooms[room]["Players"] = {}
+            configRooms[room]["Spectators"] = {}
+            configRooms[room]["PlayerCards"] = {}
+            configRooms[room]["ready"] = {}
+            configRooms[room]["theCard"] = "tipo"
             socket.emit('updateRooms', Object.keys(rooms));
         }
     });
@@ -37,20 +44,33 @@ io.sockets.on('connection', (socket) => {
             return
         }
         else {
+
             if (username === null) {return}
             if (rooms[room] == undefined) {socket.emit('updateChat', 'SERVER', 'essa sala não existe'); return}
+
             console.log(username+' entrou')
-            socket.username = username
+            
             socket.room = room
+            socket.username = username
+            
             totalUsers[username] = username
-            console.log(rooms[room])
             rooms[room][username] = username
+
+            if (Object.keys(configRooms[room]["Players"]).length < configRooms[room]["numPlayers"]) {
+                configRooms[room]["ready"][username] = false
+                configRooms[room]["Players"][username] = username
+            }
+            else if (Object.keys(configRooms[room]["Players"]).length >= configRooms[room]["numPlayers"]) {
+                configRooms[room]["Spectators"][username] = username
+            }
+
+            console.log(configRooms[room])
             socket.join(room)
             socket.emit('updateChat', 'SERVER', 'você se conectou em '+room);
-            socket.broadcast.to(room).emit('updateChat', 'SERVER', username + ' se conectou na sala');
+            socket.broadcast.to(room).emit('updateChat', 'SERVER', username + ' se conectou na sala');         
             socket.emit('updateUsers', Object.keys(rooms[room]))
-            socket.broadcast.to(room).emit('updateUsers', Object.keys(rooms[room]))
-            socket.emit('updateRooms', Object.keys(rooms))
+            socket.broadcast.to(room).emit('updateUsers', Object.keys(rooms[room]))       
+            socket.emit('updateRooms', Object.keys(rooms))       
             console.log(Object.keys(totalUsers).length)
         }
     })
@@ -84,6 +104,18 @@ io.sockets.on('connection', (socket) => {
         if (socket.room) {
             delete totalUsers[socket.username]
             delete rooms[socket.room][socket.username]
+            if (configRooms[socket.room]["Spectators"][socket.username]) { delete configRooms[socket.room]["Spectators"][socket.username] }
+            if (configRooms[socket.room]["Players"][socket.username]) {
+                delete configRooms[socket.room]["Players"][socket.username]
+                delete configRooms[socket.room]["ready"][socket.username]
+                if (configRooms[socket.room]["playing"]) {
+                    configRooms[socket.room]["turn"] += configRooms[socket.room]["direction"]
+                }
+            }
+            if (Object.keys(rooms[socket.room]).length == 0) {
+                delete rooms[socket.room]
+                delete configRooms[socket.room]
+            }
             socket.broadcast.to(socket.room).emit('updateUsers', Object.keys(rooms[socket.room]))
             socket.broadcast.to(socket.room).emit('updateChat', 'SERVER', socket.username + ' saiu dessa sala');
             socket.leave(socket.room);
