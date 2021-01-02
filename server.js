@@ -34,8 +34,9 @@ io.sockets.on('connection', (socket) => {
             configRooms[room]["Spectators"] = {}
             configRooms[room]["PlayerCards"] = {}
             configRooms[room]["Ready"] = {}
-            configRooms[room]["TheCard"] = "tipo"
+            configRooms[room]["TopCard"] = ""
             configRooms[room]["Baralho"] = []
+            configRooms[room]["Playing"] = false
             socket.emit('updateRooms', Object.keys(rooms));
         }
     });
@@ -58,22 +59,23 @@ io.sockets.on('connection', (socket) => {
             totalUsers[username] = username
             rooms[room][username] = username
 
-            if (Object.keys(configRooms[room]["Players"]).length < configRooms[room]["LimitPlayers"]) {
+            if (Object.keys(configRooms[room]["Players"]).length < configRooms[room]["LimitPlayers"] && configRooms[room]["Playing"] == false) {
                 configRooms[room]["Ready"][username] = false
                 configRooms[room]["Players"][username] = username
                 configRooms[room]["PlayerCards"][username] = []
             }
-            else if (Object.keys(configRooms[room]["Players"]).length >= configRooms[room]["LimitPlayers"]) {
+            if (Object.keys(configRooms[room]["Players"]).length >= configRooms[room]["LimitPlayers"] || configRooms[room]["Playing"] == true) {
                 configRooms[room]["Spectators"][username] = username
+                console.log(username, "é um espectador")
             }
 
-            console.log(configRooms[room])
             socket.join(room)
             socket.emit('updateChat', 'SERVER', 'você se conectou em '+room);
             socket.broadcast.to(room).emit('updateChat', 'SERVER', username + ' se conectou na sala');         
             socket.emit('updateUsers', Object.keys(rooms[room]))
             socket.broadcast.to(room).emit('updateUsers', Object.keys(rooms[room]))       
             socket.emit('updateRooms', Object.keys(rooms))       
+            console.log(configRooms[room])
             console.log(Object.keys(totalUsers).length)
         }
     })
@@ -154,14 +156,20 @@ io.sockets.on('connection', (socket) => {
     function newGame(room) {
         configRooms[room]["Baralho"] = criarBaralho()
         for(var player in configRooms[room]["PlayerCards"]) {
+            configRooms[room]["PlayerCards"][player] = []
             for (var i = 0; i < 7; i++) {
                 var carta = configRooms[room]["Baralho"][getRandomInt(0,configRooms[room]["Baralho"].length)]
-                
                 configRooms[room]["PlayerCards"][player].push(carta)
                 configRooms[room]["Baralho"].splice(configRooms[room]["Baralho"].indexOf(carta), 1);
             }
         }
-        console.log(configRooms[room]["PlayerCards"],Object.keys(configRooms[room]["Baralho"]).length)
+        var carta = configRooms[room]["Baralho"][getRandomInt(0,configRooms[room]["Baralho"].length)]
+        while (carta == "+4" || carta == "cc") {carta = configRooms[room]["Baralho"][getRandomInt(0,configRooms[room]["Baralho"].length)]}
+        configRooms[room]["TopCard"] = carta
+        configRooms[room]["Playing"] = true
+        configRooms[room]["Baralho"].splice(configRooms[room]["Baralho"].indexOf(carta), 1);
+
+        console.log(configRooms[room]["TopCard"],"\n",configRooms[room]["PlayerCards"],"\n",Object.keys(configRooms[room]["Baralho"]).length)
     }
 
 })
