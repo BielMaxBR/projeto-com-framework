@@ -1,11 +1,34 @@
 //Aliases
 let Application = PIXI.Application,
     Container = PIXI.Container,
-    loader = PIXI.loader,
-    resources = PIXI.loader.resources,
+    loader = PIXI.Loader.shared,
+    resources = PIXI.Loader.shared.resources,
     TextureCache = PIXI.utils.TextureCache,
     Sprite = PIXI.Sprite,
     Rectangle = PIXI.Rectangle;
+
+function criarBaralho() {
+    var baralhoTotal = []
+    var cores = ["r","g","y","b"]
+    var coringas = ["+4","cc"]
+    var especiais = ["+2", "jp","in"]
+    for (var i = 0; i < cores.length; i++) {
+        baralhoTotal.push(cores[i]+"0")
+        for (var j = 1; j < 10; j++) {
+            baralhoTotal.push(cores[i]+j.toString()) 
+            baralhoTotal.push(cores[i]+j.toString())
+        }
+        for (var j = 0; j < especiais.length; j++) {
+            baralhoTotal.push(cores[i]+especiais[j])
+            baralhoTotal.push(cores[i]+especiais[j])
+        }
+    }
+    for (var j = 0; j < 4; j++) {
+        baralhoTotal.push(coringas[0])
+        baralhoTotal.push(coringas[1])
+    }
+    return baralhoTotal
+}
 
 //Create a Pixi Application
 let app = new Application({ 
@@ -28,6 +51,7 @@ loader
 let cat;
 let obstac;
 var over;
+
 function setup() {
 
   //Create the `cat` sprite 
@@ -206,7 +230,6 @@ var connected = false
 socket.on('connect', function(){
     // socket.emit('adduser', prompt("What's your name: "));
     // console.log('entrei')
-    connected = true
 });
 
 socket.on('updateUsers', (UserList) => {
@@ -239,9 +262,8 @@ function switchRoom(Room) {
 }
 
 function connect(name, sala) {
-    if (connected) {
-        socket.emit('addUser', name, sala)
-    }
+    connected = true
+    socket.emit('addUser', name, sala)
 }
 
 function chat(msg) {
@@ -256,25 +278,8 @@ function test(ss) {
     }
 }
 
-function criarBaralho() {
-    var baralhoTotal = []
-    var cores = ["r","g","y","b"]
-    var coringas = ["+4","cc"]
-    var especiais = ["+2", "jp","in"]
-    for (var i = 0; i < cores.length; i++) {
-        baralhoTotal.push(cores[i]+"0")
-        for (var j = 1; j < 10; j++) {
-            baralhoTotal.push(cores[i]+j.toString()) 
-            baralhoTotal.push(cores[i]+j.toString())
-        }
-        for (var j = 0; j < especiais.length; j++) {
-            baralhoTotal.push(cores[i]+especiais[j])
-            baralhoTotal.push(cores[i]+especiais[j])
-        }
+function ready() {
+    if (connected) {
+        socket.emit('ready')
     }
-    for (var j = 0; j < 4; j++) {
-        baralhoTotal.push(coringas[0])
-        baralhoTotal.push(coringas[1])
-    }
-    return baralhoTotal
 }

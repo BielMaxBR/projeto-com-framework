@@ -10,34 +10,12 @@ const io = socketIo(server)
 var rooms = {}
 var totalUsers = {}
 var configRooms = {}
-const baralhoTotal = criarBaralho()
+
 app.use(bodyParser.json())
 app.use(express.static(path.join(__dirname, 'front')))
 
 console.log('pronto!')
 
-function criarBaralho() {
-    var baralhoTotal = []
-    var cores = ["r","g","y","b"]
-    var coringas = ["+4","cc"]
-    var especiais = ["+2", "jp","in"]
-    for (var i = 0; i < cores.length; i++) {
-        baralhoTotal.push(cores[i]+"0")
-        for (var j = 1; j < 10; j++) {
-            baralhoTotal.push(cores[i]+j.toString()) 
-            baralhoTotal.push(cores[i]+j.toString())
-        }
-        for (var j = 0; j < especiais.length; j++) {
-            baralhoTotal.push(cores[i]+especiais[j])
-            baralhoTotal.push(cores[i]+especiais[j])
-        }
-    }
-    for (var j = 0; j < 4; j++) {
-        baralhoTotal.push(coringas[0])
-        baralhoTotal.push(coringas[1])
-    }
-    return baralhoTotal
-}
 
 io.sockets.on('connection', (socket) => {
     socket.emit('updateRooms', rooms)
@@ -49,14 +27,15 @@ io.sockets.on('connection', (socket) => {
         else {
             rooms[room] = {}
             configRooms[room] = {}
-            configRooms[room]["numPlayers"] = 4
-            configRooms[room]["turn"] = 0
-            configRooms[room]["direction"] = 1
+            configRooms[room]["LimitPlayers"] = 4
+            configRooms[room]["Turn"] = 0
+            configRooms[room]["Direction"] = 1
             configRooms[room]["Players"] = {}
             configRooms[room]["Spectators"] = {}
             configRooms[room]["PlayerCards"] = {}
-            configRooms[room]["ready"] = {}
-            configRooms[room]["theCard"] = "tipo"
+            configRooms[room]["Ready"] = {}
+            configRooms[room]["TheCard"] = "tipo"
+            configRooms[room]["Baralho"] = []
             socket.emit('updateRooms', Object.keys(rooms));
         }
     });
@@ -79,11 +58,12 @@ io.sockets.on('connection', (socket) => {
             totalUsers[username] = username
             rooms[room][username] = username
 
-            if (Object.keys(configRooms[room]["Players"]).length < configRooms[room]["numPlayers"]) {
-                configRooms[room]["ready"][username] = false
+            if (Object.keys(configRooms[room]["Players"]).length < configRooms[room]["LimitPlayers"]) {
+                configRooms[room]["Ready"][username] = false
                 configRooms[room]["Players"][username] = username
+                configRooms[room]["PlayerCards"][username] = []
             }
-            else if (Object.keys(configRooms[room]["Players"]).length >= configRooms[room]["numPlayers"]) {
+            else if (Object.keys(configRooms[room]["Players"]).length >= configRooms[room]["LimitPlayers"]) {
                 configRooms[room]["Spectators"][username] = username
             }
 
@@ -96,6 +76,11 @@ io.sockets.on('connection', (socket) => {
             socket.emit('updateRooms', Object.keys(rooms))       
             console.log(Object.keys(totalUsers).length)
         }
+    })
+
+    socket.on('ready', () => {
+        configRooms[socket.room]['']
+        checkReady(socket.room)
     })
     
     socket.on('switchRoom', function(newroom) {
@@ -116,6 +101,7 @@ io.sockets.on('connection', (socket) => {
             socket.emit('updateRooms', Object.keys(rooms))
         }
     });
+
     socket.on('message', (msg)=>{
         socket.emit('updateChat', socket.username, msg)
         socket.broadcast.to(socket.room).emit('updateChat', socket.username, msg)
@@ -130,9 +116,9 @@ io.sockets.on('connection', (socket) => {
             if (configRooms[socket.room]["Spectators"][socket.username]) { delete configRooms[socket.room]["Spectators"][socket.username] }
             if (configRooms[socket.room]["Players"][socket.username]) {
                 delete configRooms[socket.room]["Players"][socket.username]
-                delete configRooms[socket.room]["ready"][socket.username]
+                delete configRooms[socket.room]["Ready"][socket.username]
                 if (configRooms[socket.room]["playing"]) {
-                    configRooms[socket.room]["turn"] += configRooms[socket.room]["direction"]
+                    configRooms[socket.room]["Turn"] += configRooms[socket.room]["Direction"]
                 }
             }
             if (Object.keys(rooms[socket.room]).length == 0) {
@@ -150,6 +136,67 @@ io.sockets.on('connection', (socket) => {
         }
     });
 
+    function checkReady(room) {
+        var isReady = true
+        if (Object.keys(configRooms[room]["Players"]).length > 1) {
+
+            for(var player in configRooms[room]["Ready"]) {
+                if (player == false) {
+                    isReady = false
+                }
+            }
+            if(isReady) {
+                newGame(room)
+            }
+        }
+    }
+
+    function newGame(room) {
+        configRooms[room]["Baralho"] = criarBaralho()
+        for(var player in configRooms[room]["PlayerCards"]) {
+            for (var i = 0; i < 7; i++) {
+                var carta = configRooms[room]["Baralho"][getRandomInt(0,configRooms[room]["Baralho"].length)]
+                
+                configRooms[room]["PlayerCards"][player].push(carta)
+                configRooms[room]["Baralho"].splice(configRooms[room]["Baralho"].indexOf(carta), 1);
+            }
+        }
+        console.log(configRooms[room]["PlayerCards"],Object.keys(configRooms[room]["Baralho"]).length)
+    }
+
 })
+
+function criarBaralho() {
+    var baralhoTotal = []
+    var cores = ["r","g","y","b"]
+    // cc é pra escolher uma cor
+    var coringas = ["+4","cc"]
+    // jp é pra pular uma pessoa
+    // in é pra inverter a sequência
+    var especiais = ["+2", "jp","in"]
+    for (var i = 0; i < cores.length; i++) {
+        baralhoTotal.push(cores[i]+"0")
+        for (var j = 1; j < 10; j++) {
+            baralhoTotal.push(cores[i]+j.toString()) 
+            baralhoTotal.push(cores[i]+j.toString())
+        }
+        for (var j = 0; j < especiais.length; j++) {
+            baralhoTotal.push(cores[i]+especiais[j])
+            baralhoTotal.push(cores[i]+especiais[j])
+        }
+    }
+    for (var j = 0; j < 4; j++) {
+        baralhoTotal.push(coringas[0])
+        baralhoTotal.push(coringas[1])
+    }
+    return baralhoTotal
+}
+
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min)) + min;
+}
+
 
 server.listen(process.env.PORT || 3000)
