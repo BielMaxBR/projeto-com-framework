@@ -227,6 +227,9 @@ var socket = io.connect(location.href);
 var usersOn = {}
 var roomsOn = []
 var connected = false
+
+var myTurn = false
+
 socket.on('connect', function(){
     // socket.emit('adduser', prompt("What's your name: "));
     // console.log('entrei')
@@ -249,10 +252,13 @@ socket.on('disconnect', () => {
     connected = false
 })
 
-socket.on('test', (data)=>{
+socket.on('Start', ()=>{
+    console.log("requestado")
+    socket.emit("requestData")    
+})
+socket.on('responceData', (data) =>{
     console.log(data)
 })
-
 function createRoom(newRoom) {
     socket.emit('createRoom', newRoom)
 }

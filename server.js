@@ -1,4 +1,4 @@
-const bodyParser = require('body-parser'); 
+const bodyParser = require('body-parser');
 const socketIo = require('socket.io')
 const express = require('express')
 const path = require('path')
@@ -66,6 +66,7 @@ io.sockets.on('connection', (socket) => {
             }
             if (Object.keys(configRooms[room]["Players"]).length >= configRooms[room]["LimitPlayers"] || configRooms[room]["Playing"] == true) {
                 configRooms[room]["Spectators"][username] = username
+                socket.emit('Start')
                 console.log(username, "é um espectador")
             }
 
@@ -73,18 +74,42 @@ io.sockets.on('connection', (socket) => {
             socket.emit('updateChat', 'SERVER', 'você se conectou em '+room);
             socket.broadcast.to(room).emit('updateChat', 'SERVER', username + ' se conectou na sala');         
             socket.emit('updateUsers', Object.keys(rooms[room]))
-            socket.broadcast.to(room).emit('updateUsers', Object.keys(rooms[room]))       
-            socket.emit('updateRooms', Object.keys(rooms))       
+            socket.broadcast.to(room).emit('updateUsers', Object.keys(rooms[room]))
+            socket.emit('updateRooms', Object.keys(rooms))
             console.log(configRooms[room])
             console.log(Object.keys(totalUsers).length)
         }
     })
 
     socket.on('ready', () => {
-        configRooms[socket.room]['']
+        configRooms[socket.room]['Ready'][socket.username] = true
         checkReady(socket.room)
     })
     
+    socket.on('requestData', ()=>{
+        data = {}
+        data["Maos"] = {}
+        for (var player in configRooms[socket.room]["PlayerCards"]) {
+            if (player == socket.username) {
+                data["minhaMao"] = configRooms[socket.room]["PlayerCards"][player]
+            }
+            else {
+                data["Maos"][player] = configRooms[socket.room]["PlayerCards"][player].length
+            }
+        }
+        
+        data["TopCard"] = configRooms[socket.room]["TopCard"]
+
+        if (configRooms[socket.room]["Players"][socket.username]) {
+            data["type"] = "Player"
+        }
+        
+        if (configRooms[socket.room]["Spectators"][socket.username]) {
+            data["type"] = "Spectator"
+        }
+        socket.emit("responceData", data)
+    })
+
     socket.on('switchRoom', function(newroom) {
         if (socket.room) {
             var oldroom;
@@ -105,6 +130,7 @@ io.sockets.on('connection', (socket) => {
     });
 
     socket.on('message', (msg)=>{
+        console.log("<"+socket.room+">"+"["+socket.username+"]"+": "+msg)
         socket.emit('updateChat', socket.username, msg)
         socket.broadcast.to(socket.room).emit('updateChat', socket.username, msg)
     })
@@ -143,9 +169,10 @@ io.sockets.on('connection', (socket) => {
         if (Object.keys(configRooms[room]["Players"]).length > 1) {
 
             for(var player in configRooms[room]["Ready"]) {
-                if (player == false) {
+                if (configRooms[room]["Ready"][player] == false) {
                     isReady = false
                 }
+                console.log("==================",isReady, player)
             }
             if(isReady) {
                 newGame(room)
@@ -170,6 +197,8 @@ io.sockets.on('connection', (socket) => {
         configRooms[room]["Baralho"].splice(configRooms[room]["Baralho"].indexOf(carta), 1);
 
         console.log(configRooms[room]["TopCard"],"\n",configRooms[room]["PlayerCards"],"\n",Object.keys(configRooms[room]["Baralho"]).length)
+        socket.emit('Start')
+        socket.broadcast.to(room).emit('Start')
     }
 
 })
