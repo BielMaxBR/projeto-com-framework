@@ -5,26 +5,93 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>cheia de manias</title>
     <style>
+        body {
+            display: flex;
+            margin-top: 5%;
+        }
         canvas {
             background: #000;
             margin: auto;
-            position: absolute;
+            /* position: absolute; */
             top: 0px;
             bottom: 0px;
             Left: 0px;
             right: 0px;
-            border: 10px solid white;
-            image-rendering: pixelated;
+            border: 10px solid grey;
+            /* image-rendering: pixelated;
             image-rendering: crisp-edges;
-            image-rendering: -moz-crisp-edges;
+            image-rendering: -moz-crisp-edges; */
             width: 500px;
             height: 500px;
+            float:center;
+            /* display: flex; */
+        }
+
+        #esquerda {
+            margin: auto;
+            float:left;
+            position: relative;
+        }
+
+        #roomList {
+            border: 2px solid grey;
+            margin-bottom: 5px;
+        }
+
+        #createRoom {
+            border: 2px solid grey;
+            margin-top: 5px;
+        }
+
+        #chat {
+            margin: auto;
+            border: 2px solid grey;
+            float:left;
+            position: relative;
+        }
+
+        #messages {
+            display: flex;
+            /* move flex-items in column */
+            flex-direction: column;
+        }
+
+        ul > :first-child {
+            margin-top: auto;
+        }
+
+        ul {
+            height: 300px;
+            list-style-type: none;
+            padding: inherit;
+            bottom: 47px;
+            top: 0px;
+            bottom: 0px;
+            Left: 0px;
+            right: 0px;
+            overflow-y: scroll;
+            margin: auto; 
         }
     </style>
 </head>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js"></script>
 <script src="https://pixijs.download/v5.3.6/pixi.min.js"></script>
 <body>
-    <script src="./index.js"></script>
+    <div id="esquerda">
+        <div id="roomList">
+            <input type="text" id="myname" placeholder="escreve um nome ae"/>
+            <ul id="rooms"><li>sala1</li><li>sala2</li></ul>
+        </div>
+        <div id="createRoom">
+            <h2 style="margin: auto;">crie uma sala</h2>
+            <input type="text" id="myroom" placeholder="escreve uma sala ae"/>
+            <!-- <ul id="rooms"><li>sala1</li><li>sala2</li></ul> -->
+        </div>
+    </div>
+    <script src="./index.js"></script> 
+    <div id="chat">
+        <ul id="messages" tabindex="1"><li>elou</li><li>elou</li></ul>
+        <input type="text" id="mytext" placeholder="escreve algo ae" onsubmit="chat()"/>
+    </div>
 </body>
 </html>

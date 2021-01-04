@@ -45,6 +45,7 @@ document.body.appendChild(app.view);
 
 loader
   .add("/sprites/cubo.png")
+  .add("/sprites/obra.png")
   .load(setup);
 
 //Define any variables that are used in more than one function
@@ -55,9 +56,10 @@ var over;
 function setup() {
 
   //Create the `cat` sprite 
-  cat = new Sprite(resources["/sprites/cubo.png"].texture);
-  cat.y = 96; 
+  cat = new Sprite(resources["/sprites/obra.png"].texture);
+  cat.y = 0;
   cat.vx = 0;
+  cat.scale.set(0.7 , 1.2 );
   app.stage.addChild(cat);
   obstac = new Sprite(resources["/sprites/cubo.png"].texture);
   obstac.y = 96
@@ -65,7 +67,7 @@ function setup() {
   obstac.vx = 0
   obstac.interactive = true;
   obstac.on('pointerdown', onClick);
-  app.stage.addChild(obstac)
+//   app.stage.addChild(obstac)
      //Capture the keyboard arrow keys
     let left = keyboard("ArrowLeft"),
         up = keyboard("ArrowUp"),
@@ -228,6 +230,9 @@ var usersOn = {}
 var roomsOn = []
 var connected = false
 
+var myName
+
+
 var myTurn = false
 
 socket.on('connect', function(){
@@ -252,13 +257,13 @@ socket.on('disconnect', () => {
     connected = false
 })
 
-socket.on('Start', ()=>{
-    console.log("requestado")
-    socket.emit("requestData")    
-})
-socket.on('responceData', (data) =>{
+socket.on('Start', (data)=>{
     console.log(data)
+    // socket.emit("requestData")    
 })
+// socket.on('responceData', (data) =>{
+    // console.log(data)
+// })
 function createRoom(newRoom) {
     socket.emit('createRoom', newRoom)
 }
@@ -272,9 +277,9 @@ function connect(name, sala) {
     socket.emit('addUser', name, sala)
 }
 
-function chat(msg) {
+function chat() {
     if (connected) {
-        socket.emit('message', msg)
+        socket.emit('message', document.getElementById('mytext').value)
     }
 }
 

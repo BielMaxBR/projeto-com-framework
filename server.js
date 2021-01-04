@@ -56,7 +56,7 @@ io.sockets.on('connection', (socket) => {
             socket.room = room
             socket.username = username
             
-            totalUsers[username] = username
+            totalUsers[username] = socket
             rooms[room][username] = username
 
             if (Object.keys(configRooms[room]["Players"]).length < configRooms[room]["LimitPlayers"] && configRooms[room]["Playing"] == false) {
@@ -66,7 +66,7 @@ io.sockets.on('connection', (socket) => {
             }
             if (Object.keys(configRooms[room]["Players"]).length >= configRooms[room]["LimitPlayers"] || configRooms[room]["Playing"] == true) {
                 configRooms[room]["Spectators"][username] = username
-                socket.emit('Start')
+                requestData(totalUsers[username])
                 console.log(username, "é um espectador")
             }
 
@@ -86,29 +86,7 @@ io.sockets.on('connection', (socket) => {
         checkReady(socket.room)
     })
     
-    socket.on('requestData', ()=>{
-        data = {}
-        data["Maos"] = {}
-        for (var player in configRooms[socket.room]["PlayerCards"]) {
-            if (player == socket.username) {
-                data["minhaMao"] = configRooms[socket.room]["PlayerCards"][player]
-            }
-            else {
-                data["Maos"][player] = configRooms[socket.room]["PlayerCards"][player].length
-            }
-        }
-        
-        data["TopCard"] = configRooms[socket.room]["TopCard"]
 
-        if (configRooms[socket.room]["Players"][socket.username]) {
-            data["type"] = "Player"
-        }
-        
-        if (configRooms[socket.room]["Spectators"][socket.username]) {
-            data["type"] = "Spectator"
-        }
-        socket.emit("responceData", data)
-    })
 
     socket.on('switchRoom', function(newroom) {
         if (socket.room) {
@@ -197,10 +175,42 @@ io.sockets.on('connection', (socket) => {
         configRooms[room]["Baralho"].splice(configRooms[room]["Baralho"].indexOf(carta), 1);
 
         console.log(configRooms[room]["TopCard"],"\n",configRooms[room]["PlayerCards"],"\n",Object.keys(configRooms[room]["Baralho"]).length)
-        socket.emit('Start')
-        socket.broadcast.to(room).emit('Start')
+        for (player in configRooms[room]["Players"]) {
+            requestData(totalUsers[player])
+        }
+        // socket.emit('Start')
+        // socket.broadcast.to(room).emit('Start')
     }
 
+    function requestData(soquete) {
+        data = {}
+        data["Maos"] = {}
+        for (var player in configRooms[soquete.room]["PlayerCards"]) {
+            if (player == soquete.username) {
+                data["minhaMao"] = configRooms[soquete.room]["PlayerCards"][player]
+            }
+            else {
+                data["Maos"][player] = configRooms[soquete.room]["PlayerCards"][player].length
+            }
+        }
+        
+        data["TopCard"] = configRooms[soquete.room]["TopCard"]
+
+        if (configRooms[soquete.room]["Players"][soquete.username]) {
+            data["type"] = "Player"
+        }
+        
+        if (configRooms[soquete.room]["Spectators"][soquete.username]) {
+            data["type"] = "Spectator"
+        }
+        soquete.emit("Start", data)
+    }
+
+    function NextTurn(room) {
+        configRooms[room]["Turn"] = (configRooms[room]["Turn"]+configRooms[room]["Direction"])
+        if (configRooms[room]["Turn"]<0) {configRooms[room]["Turn"] = Object.keys(configRooms[room]["Players"]).length-1}
+        if (configRooms[room]["Turn"]>= Object.keys(configRooms[room]["Players"]).length) {configRooms[room]["Turn"] = 0}   
+    }
 })
 
 function criarBaralho() {
@@ -236,4 +246,4 @@ function getRandomInt(min, max) {
 }
 
 
-server.listen(process.env.PORT || 3000)
+server.listen(process.env.PORT || 3003)
