@@ -36,13 +36,13 @@ let app = new Application({
     height: 256,                       
     antialias: true, 
     transparent: false, 
-    resolution: 1
+    resolution: 1,
+    view: document.getElementById('view')
   }
 );
 
 //Add the canvas that Pixi automatically created for you to the HTML document
-document.body.appendChild(app.view);
-
+// document.body.appendChild(app.view);
 loader
   .add("/sprites/cubo.png")
   .add("/sprites/obra.png")
@@ -277,9 +277,9 @@ function connect(name, sala) {
     socket.emit('addUser', name, sala)
 }
 
-function chat() {
+function chat(msg) {
     if (connected) {
-        socket.emit('message', document.getElementById('mytext').value)
+        socket.emit('message', msg)
     }
 }
 
@@ -294,3 +294,26 @@ function ready() {
         socket.emit('ready')
     }
 }
+
+document.getElementById('mytext').addEventListener('keyup', function(e){
+    var key = e.code;
+    if (key == "Enter" && this.value != "") {
+        chat(this.value)
+        this.value = ""
+    }
+});
+
+document.getElementById('myname').addEventListener('keyup', function(e){
+    var key = e.code;
+    if (key == "Enter") {
+        myName = this.value
+    }
+});
+
+document.getElementById('myroom').addEventListener('keyup', function(e){
+    var key = e.code;
+    if (key == "Enter") {
+        createRoom(this.value)
+        this.value = ""
+    }
+});

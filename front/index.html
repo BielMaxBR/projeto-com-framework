@@ -74,24 +74,26 @@
         }
     </style>
 </head>
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js"></script>
 <script src="https://pixijs.download/v5.3.6/pixi.min.js"></script>
 <body>
     <div id="esquerda">
         <div id="roomList">
-            <input type="text" id="myname" placeholder="escreve um nome ae"/>
+            <input id="myname" placeholder="escreve um nome ae"/>
             <ul id="rooms"><li>sala1</li><li>sala2</li></ul>
         </div>
         <div id="createRoom">
             <h2 style="margin: auto;">crie uma sala</h2>
-            <input type="text" id="myroom" placeholder="escreve uma sala ae"/>
+            <input id="myroom" placeholder="escreve uma sala ae"/>
             <!-- <ul id="rooms"><li>sala1</li><li>sala2</li></ul> -->
         </div>
     </div>
-    <script src="./index.js"></script> 
+    <canvas id="view"></canvas>
     <div id="chat">
         <ul id="messages" tabindex="1"><li>elou</li><li>elou</li></ul>
-        <input type="text" id="mytext" placeholder="escreve algo ae" onsubmit="chat()"/>
+        <input id="mytext" placeholder="escreve algo ae"/>
     </div>
+    <script src="./index.js"></script> 
 </body>
 </html>
