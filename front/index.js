@@ -261,11 +261,8 @@ document.getElementById('mytext').addEventListener('keyup', function(e){
     }
 });
 
-document.getElementById('myname').addEventListener('keyup', function(e){
-    var key = e.code;
-    if (key == "Enter") {
-        myName = this.value
-    }
+document.getElementById('myname').addEventListener('keyup', function(){
+    myName = this.value
 });
 
 document.getElementById('myroom').addEventListener('keyup', function(e){

@@ -29,7 +29,10 @@
         #esquerda {
             margin: auto;
             float:left;
-            margin-top: 20%;
+            position:absolute;
+            bottom: 0px;
+            left: 0px;
+            margin-bottom: 10px;
         }
 
         #roomList {
@@ -47,18 +50,21 @@
             margin-bottom: 5px;
         }
 
-        #chat {
+        #chat {    
             margin: auto;
-            height: 80%;
+            margin-bottom: 10px;
+            height: 320px;
             border: 2px solid grey;
-            float:right;
-            margin-top: 22%;
+            float: right;
+            width: 300px;
+            position: fixed;
+            bottom: 0px;
+            right: 0px;
         }
 
         #messages {
             display: flex;
             flex-direction: column;
-            width: 300px;
         }
 
         ul > :first-child {
@@ -81,7 +87,13 @@
         li {
             margin-top: 5px;
             font-size: small;
+            word-break: break-all;
         }
+
+        input {
+            width: -webkit-fill-available;
+        }
+        
     </style>
 </head>
 <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
