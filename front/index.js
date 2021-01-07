@@ -61,61 +61,12 @@ function setup() {
   cat.vx = 0;
   cat.scale.set(0.7 , 1.2 );
   app.stage.addChild(cat);
-  obstac = new Sprite(resources["/sprites/cubo.png"].texture);
-  obstac.y = 96
-  obstac.x = 60
-  obstac.vx = 0
-  obstac.interactive = true;
-  obstac.on('pointerdown', onClick);
-//   app.stage.addChild(obstac)
-     //Capture the keyboard arrow keys
-    let left = keyboard("ArrowLeft"),
-        up = keyboard("ArrowUp"),
-        right = keyboard("d"),
-        down = keyboard("ArrowDown");
-  //Start the game loop 
-
-    //Left arrow key `press` method
-  right.press = () => {
-    //Change the cat's velocity when the key is pressed
-    // cat.vx = 1;
-    cat.vy = 0;
-    // console.log("dddddd")
-  };
-
-  right.release = () => {
-      cat.vx = 0
-  }
 
   app.ticker.add(delta => gameLoop(delta));
 }
 
 function gameLoop(delta){
-    //cat.vx = 0
-    //obstac.vx = 0
-    if (over) {
-        obstac.tint = 0xDDDDDD
-    }
-    else {
-        obstac.tint = 0xFFFFFF
-    }
-    cat.x += cat.vx;
-    obstac.x += obstac.vx;
-    if (cat.x > 256) {
-        cat.x = -32
-    }
-    if (obstac.x > 256) {
-        obstac.x = -32
-    }
-    if (hitTestRectangle(obstac, cat)) {
-        // console.log("tum")
-        obstac.vx = cat.vx
-    }
-    else {
-        obstac.vx = 0
-    }
-  //Optionally use the `delta` value
-  //cat.x += 1 + delta;
+
 }
 
 function hitTestRectangle(r1, r2) {
@@ -246,11 +197,18 @@ socket.on('updateUsers', (UserList) => {
 })
 
 socket.on('updateChat',(username, data) =>{
-    console.log("["+username+"]"+": "+data)
+    var chat = document.getElementById('messages')
+    
+    chat.innerHTML +="<li>"+"["+username+"]"+": "+data+"<li>"
 })
 
 socket.on('updateRooms', (rooms) =>{
+    var salas = document.getElementById('rooms')
     roomsOn = rooms
+    salas.innerHTML = ''
+    for ( sala in roomsOn ) {
+        salas.innerHTML += '<li>'+roomsOn[sala]+'</li>'
+    }
 })
 
 socket.on('disconnect', () => {

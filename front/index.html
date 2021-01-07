@@ -6,13 +6,14 @@
     <title>cheia de manias</title>
     <style>
         body {
-            display: flex;
+            display: block;
             margin-top: 5%;
+            font-family: Arial, Helvetica, sans-serif;
         }
         canvas {
             background: #000;
             margin: auto;
-            /* position: absolute; */
+            position: absolute;
             top: 0px;
             bottom: 0px;
             Left: 0px;
@@ -21,16 +22,14 @@
             /* image-rendering: pixelated;
             image-rendering: crisp-edges;
             image-rendering: -moz-crisp-edges; */
-            width: 500px;
-            height: 500px;
-            float:center;
-            /* display: flex; */
+            width: 600px;
+            height: 600px;
         }
 
         #esquerda {
             margin: auto;
             float:left;
-            position: relative;
+            margin-top: 20%;
         }
 
         #roomList {
@@ -43,17 +42,23 @@
             margin-top: 5px;
         }
 
+        #name {
+            border: 2px solid grey;
+            margin-bottom: 5px;
+        }
+
         #chat {
             margin: auto;
+            height: 80%;
             border: 2px solid grey;
-            float:left;
-            position: relative;
+            float:right;
+            margin-top: 22%;
         }
 
         #messages {
             display: flex;
-            /* move flex-items in column */
             flex-direction: column;
+            width: 300px;
         }
 
         ul > :first-child {
@@ -69,19 +74,26 @@
             bottom: 0px;
             Left: 0px;
             right: 0px;
-            overflow-y: scroll;
+            overflow-y: auto;
             margin: auto; 
+        }
+
+        li {
+            margin-top: 5px;
+            font-size: small;
         }
     </style>
 </head>
 <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js"></script>
-<script src="https://pixijs.download/v5.3.6/pixi.min.js"></script>
 <body>
     <div id="esquerda">
-        <div id="roomList">
+        <div id="name">
+            <h2 style="margin: auto;">Nome Aqui</h2>
             <input id="myname" placeholder="escreve um nome ae"/>
-            <ul id="rooms"><li>sala1</li><li>sala2</li></ul>
+        </div>
+        <div id="roomList">
+            <ul id="rooms"></ul>
         </div>
         <div id="createRoom">
             <h2 style="margin: auto;">crie uma sala</h2>
@@ -91,9 +103,10 @@
     </div>
     <canvas id="view"></canvas>
     <div id="chat">
-        <ul id="messages" tabindex="1"><li>elou</li><li>elou</li></ul>
+        <ul id="messages" tabindex="1"></ul>
         <input id="mytext" placeholder="escreve algo ae"/>
     </div>
+    <script src="https://pixijs.download/v5.3.6/pixi.min.js"></script>
     <script src="./index.js"></script> 
 </body>
 </html>

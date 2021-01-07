@@ -18,7 +18,7 @@ console.log('pronto!')
 
 
 io.sockets.on('connection', (socket) => {
-    socket.emit('updateRooms', rooms)
+    socket.emit('updateRooms', Object.keys(rooms))
 
     socket.on('createRoom', function(room) {
         if (rooms[room]) {
@@ -127,12 +127,12 @@ io.sockets.on('connection', (socket) => {
                     configRooms[socket.room]["Turn"] += configRooms[socket.room]["Direction"]
                 }
             }
+            socket.broadcast.to(socket.room).emit('updateUsers', Object.keys(rooms[socket.room]))
+            socket.broadcast.to(socket.room).emit('updateChat', 'SERVER', socket.username + ' saiu dessa sala');
             if (Object.keys(rooms[socket.room]).length == 0) {
                 delete rooms[socket.room]
                 delete configRooms[socket.room]
             }
-            socket.broadcast.to(socket.room).emit('updateUsers', Object.keys(rooms[socket.room]))
-            socket.broadcast.to(socket.room).emit('updateChat', 'SERVER', socket.username + ' saiu dessa sala');
             socket.leave(socket.room);
             console.log(socket.username+' saiu')
             console.log(Object.keys(totalUsers).length)
