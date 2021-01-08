@@ -1,180 +1,184 @@
+
 //Aliases
-let Application = PIXI.Application,
-    Container = PIXI.Container,
-    loader = PIXI.Loader.shared,
-    resources = PIXI.Loader.shared.resources,
-    TextureCache = PIXI.utils.TextureCache,
-    Sprite = PIXI.Sprite,
-    Rectangle = PIXI.Rectangle;
+// let Application = PIXI.Application,
+//     Container = PIXI.Container,
+//     loader = PIXI.Loader.shared,
+//     resources = PIXI.Loader.shared.resources,
+//     TextureCache = PIXI.utils.TextureCache,
+//     Sprite = PIXI.Sprite,
+//     Rectangle = PIXI.Rectangle;
 
-function criarBaralho() {
-    var baralhoTotal = []
-    var cores = ["r","g","y","b"]
-    var coringas = ["+4","cc"]
-    var especiais = ["+2", "jp","in"]
-    for (var i = 0; i < cores.length; i++) {
-        baralhoTotal.push(cores[i]+"0")
-        for (var j = 1; j < 10; j++) {
-            baralhoTotal.push(cores[i]+j.toString()) 
-            baralhoTotal.push(cores[i]+j.toString())
-        }
-        for (var j = 0; j < especiais.length; j++) {
-            baralhoTotal.push(cores[i]+especiais[j])
-            baralhoTotal.push(cores[i]+especiais[j])
-        }
-    }
-    for (var j = 0; j < 4; j++) {
-        baralhoTotal.push(coringas[0])
-        baralhoTotal.push(coringas[1])
-    }
-    return baralhoTotal
-}
+// function criarBaralho() {
+//     var baralhoTotal = []
+//     var cores = ["r","g","y","b"]
+//     var coringas = ["+4","cc"]
+//     var especiais = ["+2", "jp","in"]
+//     for (var i = 0; i < cores.length; i++) {
+//         baralhoTotal.push(cores[i]+"0")
+//         for (var j = 1; j < 10; j++) {
+//             baralhoTotal.push(cores[i]+j.toString()) 
+//             baralhoTotal.push(cores[i]+j.toString())
+//         }
+//         for (var j = 0; j < especiais.length; j++) {
+//             baralhoTotal.push(cores[i]+especiais[j])
+//             baralhoTotal.push(cores[i]+especiais[j])
+//         }
+//     }
+//     for (var j = 0; j < 4; j++) {
+//         baralhoTotal.push(coringas[0])
+//         baralhoTotal.push(coringas[1])
+//     }
+//     return baralhoTotal
+// }
 
-//Create a Pixi Application
-let app = new Application({ 
-    width: 256, 
-    height: 256,                       
-    antialias: true, 
-    transparent: false, 
-    resolution: 1,
-    view: document.getElementById('view')
-  }
-);
+// //Create a Pixi Application
+// let app = new Application({ 
+//     width: 256, 
+//     height: 256,                       
+//     type: 0,
+//     antialias: true, 
+//     transparent: false, 
+//     resolution: 1,
+//     view: document.getElementById('view'),
+//   }
+// );
+// console.log(app )
+// //Add the canvas that Pixi automatically created for you to the HTML document
+// // document.body.appendChild(app.view);
+// loader
+//   .add("/sprites/cubo.png")
+//   .add("/sprites/obra.png")
+//   .load(setup);
 
-//Add the canvas that Pixi automatically created for you to the HTML document
-// document.body.appendChild(app.view);
-loader
-  .add("/sprites/cubo.png")
-  .add("/sprites/obra.png")
-  .load(setup);
+// //Define any variables that are used in more than one function
+// let cat;
+// let obstac;
+// var over;
 
-//Define any variables that are used in more than one function
-let cat;
-let obstac;
-var over;
+// function setup() {
 
-function setup() {
+//   //Create the `cat` sprite 
+//   cat = new Sprite(resources["/sprites/obra.png"].texture);
+//   cat.y = 0;
+//   cat.vx = 0;
+//   cat.scale.set(0.7 , 1.2 );
+//   app.stage.addChild(cat);
 
-  //Create the `cat` sprite 
-  cat = new Sprite(resources["/sprites/obra.png"].texture);
-  cat.y = 0;
-  cat.vx = 0;
-  cat.scale.set(0.7 , 1.2 );
-  app.stage.addChild(cat);
+//   app.ticker.add(delta => gameLoop(delta));
+// }
 
-  app.ticker.add(delta => gameLoop(delta));
-}
+// function gameLoop(delta){
 
-function gameLoop(delta){
+// }
 
-}
+// function hitTestRectangle(r1, r2) {
 
-function hitTestRectangle(r1, r2) {
+//   //Define the variables we'll need to calculate
+//   let hit, combinedHalfWidths, combinedHalfHeights, vx, vy;
 
-  //Define the variables we'll need to calculate
-  let hit, combinedHalfWidths, combinedHalfHeights, vx, vy;
+//   //hit will determine whether there's a collision
+//   hit = false;
 
-  //hit will determine whether there's a collision
-  hit = false;
+//   //Find the center points of each sprite
+//   r1.centerX = r1.x + r1.width / 2;
+//   r1.centerY = r1.y + r1.height / 2;
+//   r2.centerX = r2.x + r2.width / 2;
+//   r2.centerY = r2.y + r2.height / 2;
 
-  //Find the center points of each sprite
-  r1.centerX = r1.x + r1.width / 2;
-  r1.centerY = r1.y + r1.height / 2;
-  r2.centerX = r2.x + r2.width / 2;
-  r2.centerY = r2.y + r2.height / 2;
+//   //Find the half-widths and half-heights of each sprite
+//   r1.halfWidth = r1.width / 2;
+//   r1.halfHeight = r1.height / 2;
+//   r2.halfWidth = r2.width / 2;
+//   r2.halfHeight = r2.height / 2;
 
-  //Find the half-widths and half-heights of each sprite
-  r1.halfWidth = r1.width / 2;
-  r1.halfHeight = r1.height / 2;
-  r2.halfWidth = r2.width / 2;
-  r2.halfHeight = r2.height / 2;
+//   //Calculate the distance vector between the sprites
+//   vx = r1.centerX - r2.centerX;
+//   vy = r1.centerY - r2.centerY;
 
-  //Calculate the distance vector between the sprites
-  vx = r1.centerX - r2.centerX;
-  vy = r1.centerY - r2.centerY;
+//   //Figure out the combined half-widths and half-heights
+//   combinedHalfWidths = r1.halfWidth + r2.halfWidth;
+//   combinedHalfHeights = r1.halfHeight + r2.halfHeight;
 
-  //Figure out the combined half-widths and half-heights
-  combinedHalfWidths = r1.halfWidth + r2.halfWidth;
-  combinedHalfHeights = r1.halfHeight + r2.halfHeight;
+//   //Check for a collision on the x axis
+//   if (Math.abs(vx) < combinedHalfWidths) {
 
-  //Check for a collision on the x axis
-  if (Math.abs(vx) < combinedHalfWidths) {
+//     //A collision might be occurring. Check for a collision on the y axis
+//     if (Math.abs(vy) < combinedHalfHeights) {
 
-    //A collision might be occurring. Check for a collision on the y axis
-    if (Math.abs(vy) < combinedHalfHeights) {
+//       //There's definitely a collision happening
+//       hit = true;
+//     } else {
 
-      //There's definitely a collision happening
-      hit = true;
-    } else {
+//       //There's no collision on the y axis
+//       hit = false;
+//     }
+//   } else {
 
-      //There's no collision on the y axis
-      hit = false;
-    }
-  } else {
+//     //There's no collision on the x axis
+//     hit = false;
+//   }
 
-    //There's no collision on the x axis
-    hit = false;
-  }
+//   //`hit` will be either `true` or `false`
+//   return hit;
+// };
 
-  //`hit` will be either `true` or `false`
-  return hit;
-};
+// function keyboard(value) {
+//   let key = {};
+//   key.value = value.toLowerCase();
+//   key.isDown = false;
+//   key.isUp = true;
+//   key.press = undefined;
+//   key.release = undefined;
+//   //The `downHandler`
+//   key.downHandler = event => {
+//     if (event.key === key.value) {
+//       if (key.isUp && key.press) key.press();
+//       key.isDown = true;
+//       key.isUp = false;
+//       event.preventDefault();
+//     }
+//   };
 
-function keyboard(value) {
-  let key = {};
-  key.value = value.toLowerCase();
-  key.isDown = false;
-  key.isUp = true;
-  key.press = undefined;
-  key.release = undefined;
-  //The `downHandler`
-  key.downHandler = event => {
-    if (event.key === key.value) {
-      if (key.isUp && key.press) key.press();
-      key.isDown = true;
-      key.isUp = false;
-      event.preventDefault();
-    }
-  };
+//   //The `upHandler`
+//   key.upHandler = event => {
+//     if (event.key === key.value) {
+//       if (key.isDown && key.release) key.release();
+//       key.isDown = false;
+//       key.isUp = true;
+//       event.preventDefault();
+//     }
+//   };
 
-  //The `upHandler`
-  key.upHandler = event => {
-    if (event.key === key.value) {
-      if (key.isDown && key.release) key.release();
-      key.isDown = false;
-      key.isUp = true;
-      event.preventDefault();
-    }
-  };
-
-  //Attach event listeners
-  const downListener = key.downHandler.bind(key);
-  const upListener = key.upHandler.bind(key);
+//   //Attach event listeners
+//   const downListener = key.downHandler.bind(key);
+//   const upListener = key.upHandler.bind(key);
   
-  window.addEventListener(
-    "keydown", downListener, false
-  );
-  window.addEventListener(
-    "keyup", upListener, false
-  );
+//   window.addEventListener(
+//     "keydown", downListener, false
+//   );
+//   window.addEventListener(
+//     "keyup", upListener, false
+//   );
   
-  // Detach event listeners
-  key.unsubscribe = () => {
-    window.removeEventListener("keydown", downListener);
-    window.removeEventListener("keyup", upListener);
-  };
+//   // Detach event listeners
+//   key.unsubscribe = () => {
+//     window.removeEventListener("keydown", downListener);
+//     window.removeEventListener("keyup", upListener);
+//   };
   
-  return key;
-}
+//   return key;
+// }
 
-function onClick(){
-    //obstac.y += 20
-    // console.log("click")
-}
+// function onClick(){
+//     //obstac.y += 20
+//     // console.log("click")
+// }
 
 
 // aqui comeca a loucura
-
+var ctx = document.getElementById('view').getContext('2d')
+var img = image = document.getElementById('source');
+ctx.drawImage(img, 0, 0, 276, 256)
 
 var socket = io.connect(location.href);
 var usersOn = {}
