@@ -207,7 +207,7 @@ socket.on('updateRooms', (rooms) =>{
     roomsOn = rooms
     salas.innerHTML = ''
     for ( sala in roomsOn ) {
-        salas.innerHTML += '<li>'+roomsOn[sala]+'</li>'
+        salas.innerHTML += '<li>'+roomsOn[sala]+"<button style=\"float: right;\" onclick=\"connect(myName.toString(),\'"+roomsOn[sala]+"\')\">Entrar</button>"+'</li>'
     }
 })
 
@@ -231,8 +231,13 @@ function switchRoom(Room) {
 }
 
 function connect(name, sala) {
-    connected = true
-    socket.emit('addUser', name, sala)
+    if (name) {
+        connected = true
+        socket.emit('addUser', name, sala)
+    }
+    else {
+        console.log('insira um nome')
+    }
 }
 
 function chat(msg) {

@@ -90,7 +90,7 @@
             word-break: break-all;
         }
 
-        input {
+        .inputText {
             width: -webkit-fill-available;
         }
         
@@ -102,21 +102,21 @@
     <div id="esquerda">
         <div id="name">
             <h2 style="margin: auto;">Nome Aqui</h2>
-            <input id="myname" placeholder="escreve um nome ae"/>
+            <input class="inputText" id="myname" placeholder="escreve um nome ae"/>
         </div>
         <div id="roomList">
             <ul id="rooms"></ul>
         </div>
         <div id="createRoom">
             <h2 style="margin: auto;">crie uma sala</h2>
-            <input id="myroom" placeholder="escreve uma sala ae"/>
+            <input class="inputText" id="myroom" placeholder="escreve uma sala ae"/>
             <!-- <ul id="rooms"><li>sala1</li><li>sala2</li></ul> -->
         </div>
     </div>
     <canvas id="view"></canvas>
     <div id="chat">
         <ul id="messages" tabindex="1"></ul>
-        <input id="mytext" placeholder="escreve algo ae"/>
+        <input class="inputText" id="mytext" placeholder="escreve algo ae"/>
     </div>
     <script src="https://pixijs.download/v5.3.6/pixi.min.js"></script>
     <script src="./index.js"></script> 

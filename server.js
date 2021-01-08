@@ -18,7 +18,7 @@ console.log('pronto!')
 
 
 io.sockets.on('connection', (socket) => {
-    socket.emit('updateRooms', Object.keys(rooms))
+    socket.emit('updateRooms', Object.keys(rooms), socket.room)
 
     socket.on('createRoom', function(room) {
         if (rooms[room]) {
@@ -37,7 +37,7 @@ io.sockets.on('connection', (socket) => {
             configRooms[room]["TopCard"] = ""
             configRooms[room]["Baralho"] = []
             configRooms[room]["Playing"] = false
-            socket.emit('updateRooms', Object.keys(rooms));
+            socket.emit('updateRooms', Object.keys(rooms), socket.room);
         }
     });
 
@@ -75,7 +75,7 @@ io.sockets.on('connection', (socket) => {
             socket.broadcast.to(room).emit('updateChat', 'SERVER', username + ' se conectou na sala');         
             socket.emit('updateUsers', Object.keys(rooms[room]))
             socket.broadcast.to(room).emit('updateUsers', Object.keys(rooms[room]))
-            socket.emit('updateRooms', Object.keys(rooms))
+            socket.emit('updateRooms', Object.keys(rooms), socket.room)
             console.log(configRooms[room])
             console.log(Object.keys(totalUsers).length)
         }
@@ -103,7 +103,7 @@ io.sockets.on('connection', (socket) => {
             rooms[newroom][socket.username] = socket.username
             socket.emit('updateUsers', Object.keys(rooms[newroom]))
             socket.broadcast.to(newroom).emit('updateUsers', Object.keys(rooms[newroom]))
-            socket.emit('updateRooms', Object.keys(rooms))
+            socket.emit('updateRooms', Object.keys(rooms), socket.room)
         }
     });
 
@@ -132,6 +132,9 @@ io.sockets.on('connection', (socket) => {
             if (Object.keys(rooms[socket.room]).length == 0) {
                 delete rooms[socket.room]
                 delete configRooms[socket.room]
+                for ( player in totalUsers ) {
+                    totalUsers[player].emit('updateRooms', Object.keys(rooms), socket.room)
+                }
             }
             socket.leave(socket.room);
             console.log(socket.username+' saiu')
