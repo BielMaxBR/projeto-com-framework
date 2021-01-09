@@ -18,7 +18,7 @@ console.log('pronto!')
 
 
 io.sockets.on('connection', (socket) => {
-    socket.emit('updateRooms', Object.keys(rooms), socket.room)
+    socket.emit('updateRooms', Object.keys(rooms))
 
     socket.on('createRoom', function(room) {
         if (rooms[room]) {
@@ -37,7 +37,8 @@ io.sockets.on('connection', (socket) => {
             configRooms[room]["TopCard"] = ""
             configRooms[room]["Baralho"] = []
             configRooms[room]["Playing"] = false
-            socket.emit('updateRooms', Object.keys(rooms), socket.room);
+            socket.broadcast.emit('updateRooms', Object.keys(rooms));
+            socket.emit('updateRooms', Object.keys(rooms));
         }
     });
 
@@ -75,7 +76,7 @@ io.sockets.on('connection', (socket) => {
             socket.broadcast.to(room).emit('updateChat', 'SERVER', username + ' se conectou na sala');         
             socket.emit('updateUsers', Object.keys(rooms[room]))
             socket.broadcast.to(room).emit('updateUsers', Object.keys(rooms[room]))
-            socket.emit('updateRooms', Object.keys(rooms), socket.room)
+            socket.emit('updateRooms', Object.keys(rooms))
             console.log(configRooms[room])
             console.log(Object.keys(totalUsers).length)
         }
@@ -103,7 +104,7 @@ io.sockets.on('connection', (socket) => {
             rooms[newroom][socket.username] = socket.username
             socket.emit('updateUsers', Object.keys(rooms[newroom]))
             socket.broadcast.to(newroom).emit('updateUsers', Object.keys(rooms[newroom]))
-            socket.emit('updateRooms', Object.keys(rooms), socket.room)
+            socket.emit('updateRooms', Object.keys(rooms))
         }
     });
 
@@ -111,6 +112,15 @@ io.sockets.on('connection', (socket) => {
         console.log("<"+socket.room+">"+"["+socket.username+"]"+": "+msg)
         socket.emit('updateChat', socket.username, msg)
         socket.broadcast.to(socket.room).emit('updateChat', socket.username, msg)
+    })
+
+    socket.on('useCard', (carta)=>{
+        configRooms[socket.room]["PlayerCards"][socket.username] = arrayRemove(configRooms[socket.room]["PlayerCards"][socket.username], carta)
+        configRooms[socket.room]["TopCard"] = carta
+        for (player in configRooms[socket.room]["Players"]) {
+            requestData(totalUsers[player])
+        }
+        NextTurn(socket.room, false)
     })
 
     socket.on('test', (rr)=>{socket.emit('test', rooms[rr])})
@@ -132,9 +142,7 @@ io.sockets.on('connection', (socket) => {
             if (Object.keys(rooms[socket.room]).length == 0) {
                 delete rooms[socket.room]
                 delete configRooms[socket.room]
-                for ( player in totalUsers ) {
-                    totalUsers[player].emit('updateRooms', Object.keys(rooms), socket.room)
-                }
+                socket.broadcast.emit('updateRooms', Object.keys(rooms));
             }
             socket.leave(socket.room);
             console.log(socket.username+' saiu')
@@ -181,6 +189,7 @@ io.sockets.on('connection', (socket) => {
         for (player in configRooms[room]["Players"]) {
             requestData(totalUsers[player])
         }
+        NextTurn(room, true)
         // socket.emit('Start')
         // socket.broadcast.to(room).emit('Start')
     }
@@ -209,10 +218,15 @@ io.sockets.on('connection', (socket) => {
         soquete.emit("Start", data)
     }
 
-    function NextTurn(room) {
-        configRooms[room]["Turn"] = (configRooms[room]["Turn"]+configRooms[room]["Direction"])
-        if (configRooms[room]["Turn"]<0) {configRooms[room]["Turn"] = Object.keys(configRooms[room]["Players"]).length-1}
-        if (configRooms[room]["Turn"]>= Object.keys(configRooms[room]["Players"]).length) {configRooms[room]["Turn"] = 0}   
+    function NextTurn(room, isInit) {
+        if (!isInit) {
+            configRooms[room]["Turn"] = (configRooms[room]["Turn"]+configRooms[room]["Direction"])
+            if (configRooms[room]["Turn"]<0) {configRooms[room]["Turn"] = Object.keys(configRooms[room]["Players"]).length-1}
+            if (configRooms[room]["Turn"]>= Object.keys(configRooms[room]["Players"]).length) {configRooms[room]["Turn"] = 0} 
+        }
+        console.log("turno: ", configRooms[room]["Turn"])  
+        var player = totalUsers[Object.keys(configRooms[room]["Players"])[configRooms[room]["Turn"]]]
+        player.emit('myTurn')
     }
 })
 
@@ -248,5 +262,10 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
 }
 
+function arrayRemove(arr, value) { 
 
+    return arr.filter(function(ele){ 
+        return ele != value; 
+    });
+}
 server.listen(process.env.PORT || 3003)

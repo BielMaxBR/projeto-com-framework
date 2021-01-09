@@ -186,7 +186,7 @@ var roomsOn = []
 var connected = false
 
 var myName
-
+var myData = {}
 
 var myTurn = false
 
@@ -211,8 +211,13 @@ socket.on('updateRooms', (rooms) =>{
     roomsOn = rooms
     salas.innerHTML = ''
     for ( sala in roomsOn ) {
-        salas.innerHTML += '<li>'+roomsOn[sala]+"<button style=\"float: right;\" onclick=\"connect(myName.toString(),\'"+roomsOn[sala]+"\')\">Entrar</button>"+'</li>'
+        salas.innerHTML += '<li>'+roomsOn[sala]+"<button style=\"\" onclick=\"connect(myName.toString(),\'"+roomsOn[sala]+"\')\">Entrar</button>"+'</li>'
     }
+})
+
+socket.on('myTurn', ()=>{
+    console.log('sou eu!')
+    myTurn = true
 })
 
 socket.on('disconnect', () => {
@@ -221,6 +226,7 @@ socket.on('disconnect', () => {
 
 socket.on('Start', (data)=>{
     console.log(data)
+    myData = data
     // socket.emit("requestData")    
 })
 // socket.on('responceData', (data) =>{
@@ -259,6 +265,15 @@ function test(ss) {
 function ready() {
     if (connected) {
         socket.emit('ready')
+    }
+}
+
+function useCard(id) {
+    if (myTurn) {
+        var carta = myData["minhaMao"][id]
+        myData["minhaMao"].splice(id, 1);
+        myData["TopCard"] = carta
+        socket.emit('useCard', carta)
     }
 }
 
