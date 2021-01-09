@@ -277,6 +277,12 @@ function useCard(id) {
     }
 }
 
+function buyCard() {
+    socket.emit('buyCard', 1)
+} 
+
+
+
 document.getElementById('mytext').addEventListener('keyup', function(e){
     var key = e.code;
     if (key == "Enter" && this.value != "") {

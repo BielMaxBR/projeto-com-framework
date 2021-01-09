@@ -123,6 +123,18 @@ io.sockets.on('connection', (socket) => {
         NextTurn(socket.room, false)
     })
 
+    socket.on('buyCard', (numCards)=>{
+        while (numCards > 0) {
+            var carta = configRooms[socket.room]["Baralho"][getRandomInt(0,configRooms[socket.room]["Baralho"].length)]
+            configRooms[socket.room]["PlayerCards"][socket.username].push(carta)
+            configRooms[socket.room]["Baralho"].splice(configRooms[socket.room]["Baralho"].indexOf(carta), 1);
+            numCards--
+        }
+        for (player in configRooms[socket.room]["Players"]) {
+            requestData(totalUsers[player])
+        }
+    }) 
+
     socket.on('test', (rr)=>{socket.emit('test', rooms[rr])})
 
     socket.on('disconnect', function() {
