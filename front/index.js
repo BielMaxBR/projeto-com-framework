@@ -176,9 +176,12 @@
 
 
 // aqui comeca a loucura
-var ctx = document.getElementById('view').getContext('2d')
-var img = image = document.getElementById('source');
-ctx.drawImage(img, 0, 0, 276, 256)
+
+setTimeout(()=>{
+    var ctx = document.getElementById('view').getContext('2d')
+    var img = image = document.getElementById('source');
+    ctx.drawImage(img, 0, 0, 276, 256)
+},100)
 
 var socket = io.connect(location.href);
 var usersOn = {}
@@ -229,9 +232,19 @@ socket.on('Start', (data)=>{
     myData = data
     // socket.emit("requestData")    
 })
-// socket.on('responceData', (data) =>{
-    // console.log(data)
-// })
+
+socket.on('updateBuy', (number, username) =>{
+    if (username != myName) {
+        myData["Maos"][username] = number
+    }
+    console.log(myData)
+})
+
+socket.on('NewCards', (novaMao) =>{
+    myData["minhaMao"] = novaMao
+    console.log(myData)
+})
+
 function createRoom(newRoom) {
     socket.emit('createRoom', newRoom)
 }

@@ -124,15 +124,7 @@ io.sockets.on('connection', (socket) => {
     })
 
     socket.on('buyCard', (numCards)=>{
-        while (numCards > 0) {
-            var carta = configRooms[socket.room]["Baralho"][getRandomInt(0,configRooms[socket.room]["Baralho"].length)]
-            configRooms[socket.room]["PlayerCards"][socket.username].push(carta)
-            configRooms[socket.room]["Baralho"].splice(configRooms[socket.room]["Baralho"].indexOf(carta), 1);
-            numCards--
-        }
-        for (player in configRooms[socket.room]["Players"]) {
-            requestData(totalUsers[player])
-        }
+        buyCards(socket.room, socket, numCards)
     }) 
 
     socket.on('test', (rr)=>{socket.emit('test', rooms[rr])})
@@ -231,14 +223,50 @@ io.sockets.on('connection', (socket) => {
     }
 
     function NextTurn(room, isInit) {
+        var turnplus = 0
         if (!isInit) {
-            configRooms[room]["Turn"] = (configRooms[room]["Turn"]+configRooms[room]["Direction"])
+            var turnjmp = 1
+            if (configRooms[room]["TopCard"].indexOf("jp") != -1) {
+                turnjmp = 2
+            }
+            else if (configRooms[room]["TopCard"].indexOf("+2") != -1) {
+                turnplus = 2
+            }
+            
+            else if (configRooms[room]["TopCard"].indexOf("+4") != -1) {
+                turnplus = 4
+            }
+            configRooms[room]["Turn"] = (configRooms[room]["Turn"]+(configRooms[room]["Direction"])*turnjmp)
             if (configRooms[room]["Turn"]<0) {configRooms[room]["Turn"] = Object.keys(configRooms[room]["Players"]).length-1}
-            if (configRooms[room]["Turn"]>= Object.keys(configRooms[room]["Players"]).length) {configRooms[room]["Turn"] = 0} 
+            if (configRooms[room]["Turn"]>= Object.keys(configRooms[room]["Players"]).length) {configRooms[room]["Turn"] = 0}
+
         }
-        console.log("turno: ", configRooms[room]["Turn"])  
         var player = totalUsers[Object.keys(configRooms[room]["Players"])[configRooms[room]["Turn"]]]
+        console.log("turno de: ", Object.keys(configRooms[room]["Players"])[configRooms[room]["Turn"]])  
         player.emit('myTurn')
+        buyCards(player, turnplus)
+    }
+
+    function buyCards(PlayerSocket, num) {
+        var numCards = num
+        var player = PlayerSocket
+        var room = player.room
+        var username = player.username
+        if (!configRooms[room]["Playing"] || num == 0) {return}
+        console.log(username," ",configRooms[room]["PlayerCards"][username])
+        while (numCards > 0) {
+            var carta = configRooms[room]["Baralho"][getRandomInt(0,configRooms[room]["Baralho"].length)]
+            configRooms[room]["PlayerCards"][username].push(carta)
+            configRooms[room]["Baralho"].splice(configRooms[room]["Baralho"].indexOf(carta), 1);
+            numCards--
+        }
+
+        for (playerIndex in configRooms[room]["Players"]) {
+            totalUsers[playerIndex].emit('updateBuy', configRooms[room]["PlayerCards"][username].length, username)
+        }
+        socket.emit('NewCards',configRooms[room]["PlayerCards"][username])
+        console.log(configRooms[room]["PlayerCards"][username])
+        
     }
 })
 
