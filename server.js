@@ -115,6 +115,7 @@ io.sockets.on('connection', (socket) => {
     })
 
     socket.on('useCard', (carta)=>{
+        console.log('carta usada por: ', socket.username)
         configRooms[socket.room]["PlayerCards"][socket.username] = arrayRemove(configRooms[socket.room]["PlayerCards"][socket.username], carta)
         configRooms[socket.room]["TopCard"] = carta
         for (player in configRooms[socket.room]["Players"]) {
@@ -124,7 +125,8 @@ io.sockets.on('connection', (socket) => {
     })
 
     socket.on('buyCard', (numCards)=>{
-        buyCards(socket.room, socket, numCards)
+        console.log(socket.username, ' comprou carta')
+        buyCards(socket, numCards)
     }) 
 
     socket.on('test', (rr)=>{socket.emit('test', rooms[rr])})
@@ -223,6 +225,8 @@ io.sockets.on('connection', (socket) => {
     }
 
     function NextTurn(room, isInit) {
+        var antesplayer = totalUsers[Object.keys(configRooms[room]["Players"])[configRooms[room]["Turn"]]]
+        console.log("turno era de: ", antesplayer.username)  
         var turnplus = 0
         if (!isInit) {
             var turnjmp = 1
@@ -242,9 +246,9 @@ io.sockets.on('connection', (socket) => {
 
         }
         var player = totalUsers[Object.keys(configRooms[room]["Players"])[configRooms[room]["Turn"]]]
-        console.log("turno de: ", Object.keys(configRooms[room]["Players"])[configRooms[room]["Turn"]])  
-        player.emit('myTurn')
         buyCards(player, turnplus)
+        console.log("agora de: ", player.username)
+        player.emit('myTurn')
     }
 
     function buyCards(PlayerSocket, num) {
@@ -252,9 +256,11 @@ io.sockets.on('connection', (socket) => {
         var player = PlayerSocket
         var room = player.room
         var username = player.username
+        if (!configRooms[room]) {return}
         if (!configRooms[room]["Playing"] || num == 0) {return}
         console.log(username," ",configRooms[room]["PlayerCards"][username])
         while (numCards > 0) {
+            console.log(numCards)
             var carta = configRooms[room]["Baralho"][getRandomInt(0,configRooms[room]["Baralho"].length)]
             configRooms[room]["PlayerCards"][username].push(carta)
             configRooms[room]["Baralho"].splice(configRooms[room]["Baralho"].indexOf(carta), 1);
@@ -264,8 +270,8 @@ io.sockets.on('connection', (socket) => {
         for (playerIndex in configRooms[room]["Players"]) {
             totalUsers[playerIndex].emit('updateBuy', configRooms[room]["PlayerCards"][username].length, username)
         }
-        socket.emit('NewCards',configRooms[room]["PlayerCards"][username])
-        console.log(configRooms[room]["PlayerCards"][username])
+        socket.emit('NewCards', configRooms[room]["PlayerCards"][username])
+        console.log(username," ", configRooms[room]["PlayerCards"][username])
         
     }
 })

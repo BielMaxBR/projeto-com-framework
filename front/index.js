@@ -236,8 +236,8 @@ socket.on('Start', (data)=>{
 socket.on('updateBuy', (number, username) =>{
     if (username != myName) {
         myData["Maos"][username] = number
+        console.log(myData)
     }
-    console.log(myData)
 })
 
 socket.on('NewCards', (novaMao) =>{
@@ -282,7 +282,7 @@ function ready() {
 }
 
 function useCard(id) {
-    if (myTurn) {
+    if (myTurn && myData["minhaMao"][id]) {
         var carta = myData["minhaMao"][id]
         myData["minhaMao"].splice(id, 1);
         myData["TopCard"] = carta
